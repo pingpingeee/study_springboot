@@ -24,11 +24,31 @@
 				});
 			}
 		</script>
+		<style>
+			.uploadResult {
+				width: 100%;
+				background-color: gray;
+			}
+
+			.uploadResult ul {
+				display: flex;
+				flex-flow: row;
+			}
+
+			.uploadResult ul li {
+				list-style: none;
+				padding: 10px;
+			}
+
+			.uploadResult ul li img {
+				width: 20px;
+			}
+		</style>
 	</head>
 
 	<body>
 		<table width="500" border="1">
-			<form id="frm">
+			<form id="frm" method="post" action="write">
 				<tr>
 					<td>이름</td>
 					<td>
@@ -49,7 +69,8 @@
 				</tr>
 				<tr>
 					<td colspan="2">
-						<input type="button" onclick="fn_submit()" value="입력">
+						<!-- <input type="button" onclick="fn_submit()" value="입력"> -->
+						<button type="submit">입력</button>
 						&nbsp;&nbsp;
 						<a href="list">목록</a>
 					</td>
@@ -71,6 +92,37 @@
 	</html>
 	<script>
 		$(document).ready(function (e) {
+			var formObj = $("form[id=frm]");
+
+			$("button[type='submit']").on("click", function (e) {
+				e.preventDefault();
+				console.log("submit clicked");
+
+				var str = "";
+
+				$(".uploadResult ul li").each(function (i, obj) {
+					console.log("@# obj => " + $(obj));
+					console.log("@# obj.data => " + $(obj).data);
+					console.log("@# obj.data.filename => " + $(obj).data("filename"));
+
+					var jobj = $(obj);
+					console.log("====================================");
+					console.log("@# filename2 => " + jobj.data("filename"));
+					console.log("@# uuid => " + jobj.data("uuid"));
+					console.log("@# path => " + jobj.data("path"));
+					console.log("@# type => " + jobj.data("type"));
+
+					str += "<input type='hidden' name='attachList[" + i + "].fileName' value='" + jobj.data("filename") + "'>"
+					str += "<input type='hidden' name='attachList[" + i + "].fileName' value='" + jobj.data("uuid") + "'>"
+					str += "<input type='hidden' name='attachList[" + i + "].fileName' value='" + jobj.data("path") + "'>"
+					str += "<input type='hidden' name='attachList[" + i + "].fileName' value='" + jobj.data("type") + "'>"
+				});
+
+				console.log("@# uploadResult str => " + str);
+
+				formObj.append(str).submit();
+			}); // end of button submit
+
 			// 확장자가 exe|sh|alz 업로드 금지하기 위한 정규식
 			var regex = new RegExp("(.*?)\.(exe|sh|alz)");
 			// 파일크기 (5MB 미만) 조건
@@ -138,20 +190,51 @@
 							console.log("@#obj.uuid =>" + obj.uuid);
 							console.log("@#obj.fileName =>" + obj.fileName);
 
-							var fileCallPath = obj.uploadPath + obj.uuid + "_" + obj.fileName;
-							str += "<li><div>"
+							// var fileCallPath = obj.uploadPath + "/" + obj.uuid + "_" + obj.fileName;
+							// 썸네일처럼 작게 만들기 위해 s_붙힘
+							var fileCallPath = obj.uploadPath + "/s_" + obj.uuid + "_" + obj.fileName;
+							str += "<li><div>";
 							str += "<span>" + obj.fileName + "</span>";
-							str += "<img src='/display?fileName=" + fileCallPath + "'>";
-							str += "</li>"
+							str += "<img src='/display?fileName=" + fileCallPath + "'>"; // 이미지 출력 처리(컨트롤러단)
+							str += "<span data-file=\'" + fileCallPath + "\'data-type=image'> x</span";
+							str += "</div></li>";
 						} else {
 							// var fileCallPath = encodeURIComponent(obj.uploadPath + "/" + obj.uuid + "_" + obj.fileName);
-							var fileCallPath = obj.uploadPath + obj.uuid + "_" + obj.fileName;
-							str += "<li><div>"
+							var fileCallPath = obj.uploadPath + "/" + obj.uuid + "_" + obj.fileName;
+							str += "<li><div>";
 							str += "<span>" + obj.fileName + "</span>";
-							str += "<img src='./resources/img/attach.png'>";
-							str += "</li>"
+							str += "<img src='./resources/attach.png'>";
+							str += "<span data-file=\'" + fileCallPath + "\'data-type=file'> x</span";
+							str += "</div></li>";
 						}
 					}); // end of each
+					console.log("@# str=> " + str);
+
+					// div class에 파일 목록 추가
+					uploadUL.append(str);
+
+					$(".uploadResult").on("click", "span", function () {
+						var targetFile = $(this).data("file");
+						var type = $(this).data("type");
+						var uploadResultItem = $(this).closest("li");
+
+						console.log("@# targetFile => " + targetFile);
+						console.log("@# type => " + type);
+						console.log("@# uploadResultItem => " + uploadResultItem);
+
+						// 컨트롤러 단에서 업로드된 실제파일 삭제
+						$.ajax({
+							type: "post",
+							data: { fileName: targetFile, type: type },
+							url: "deleteFile",
+							success: function (result) {
+								alert("result");
+
+								// 브라우저에서 해당 썸네일이나 첨부파일 이미지 제거
+								uploadResultItem.remove();
+							}
+						}); // end of ajax
+					}); // end of click
 				}
 			}) // end of change
 		}); // end of ready

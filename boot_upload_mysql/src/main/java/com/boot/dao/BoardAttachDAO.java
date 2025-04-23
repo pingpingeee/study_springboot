@@ -1,14 +1,15 @@
-package com.boot.service;
+package com.boot.dao;
+
+import com.boot.dto.BoardDTO;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.boot.dto.BoardDTO;
-
-public interface BoardService {
+@Mapper
+public interface BoardAttachDAO {
 	public ArrayList<BoardDTO> list();
 
-//	public void write(HashMap<String, String> param);
 	public void write(BoardDTO boardDTO);
 
 	public BoardDTO contentView(HashMap<String, String> param);

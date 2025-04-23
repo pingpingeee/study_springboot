@@ -19,67 +19,74 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @Slf4j
 public class BoardController {
-	@Autowired
-	private BoardService service;
-	@Autowired
-	private CommentService commentService;
+    @Autowired
+    private BoardService service;
+    @Autowired
+    private CommentService commentService;
 
-	@RequestMapping("/list")
+    @RequestMapping("/list")
 //	public String list(Model model) {
-	public String list(Model model) {
-		log.info("@# list()");
+    public String list(Model model) {
+        log.info("@# list()");
 
-		
-		ArrayList<BoardDTO> list = service.list();
-		model.addAttribute("list", list);
-		
-		return "list";
-	}
 
-	@RequestMapping("/write")
-	public String write(@RequestParam HashMap<String, String> param) {
-		log.info("@# write()");
+        ArrayList<BoardDTO> list = service.list();
+        model.addAttribute("list", list);
 
-		service.write(param);
+        return "list";
+    }
 
-		return "redirect:list";
-	}
+    @RequestMapping("/write")
+//	public String write(@RequestParam HashMap<String, String> param) {
+    public String write(BoardDTO boardDTO) {
+        log.info("@# write()");
+        log.info("@# boardDTO => " + boardDTO);
 
-	@RequestMapping("/write_view")
-	public String write_view() {
-		log.info("@# write_view()");
+        if (boardDTO.getAttachList() != null) {
+            boardDTO.getAttachList().forEach(attach -> log.info("@# attach =>" + attach));
+        }
 
-		return "write_view";
-	}
+//        service.write(param);
+        service.write(boardDTO);
 
-	@RequestMapping("/content_view")
-	public String content_view(@RequestParam HashMap<String, String> param, Model model) {
-		log.info("@# content_view()");
-		
-		BoardDTO dto = service.contentView(param);
-		ArrayList<CommentDTO> cDto = commentService.findall(param);
+        return "redirect:list";
+    }
+
+    @RequestMapping("/write_view")
+    public String write_view() {
+        log.info("@# write_view()");
+
+        return "write_view";
+    }
+
+    @RequestMapping("/content_view")
+    public String content_view(@RequestParam HashMap<String, String> param, Model model) {
+        log.info("@# content_view()");
+
+        BoardDTO dto = service.contentView(param);
+        ArrayList<CommentDTO> cDto = commentService.findall(param);
 //		log.info("@# cDto => "+cDto);
-		model.addAttribute("content_view", dto);
-		model.addAttribute("commentList", cDto);
-		
-		return "content_view";
-	}
+        model.addAttribute("content_view", dto);
+        model.addAttribute("commentList", cDto);
 
-	@RequestMapping("/modify")
-	public String modify(@RequestParam HashMap<String, String> param) {
-		log.info("@# modify()");
+        return "content_view";
+    }
 
-		service.modify(param);
+    @RequestMapping("/modify")
+    public String modify(@RequestParam HashMap<String, String> param) {
+        log.info("@# modify()");
 
-		return "redirect:list";
-	}
+        service.modify(param);
 
-	@RequestMapping("/delete")
-	public String delete(@RequestParam HashMap<String, String> param) {
-		log.info("@# delete()");
+        return "redirect:list";
+    }
 
-		service.delete(param);
+    @RequestMapping("/delete")
+    public String delete(@RequestParam HashMap<String, String> param) {
+        log.info("@# delete()");
 
-		return "redirect:list";
-	}
+        service.delete(param);
+
+        return "redirect:list";
+    }
 }
