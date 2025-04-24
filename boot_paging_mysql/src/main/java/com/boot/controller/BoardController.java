@@ -31,7 +31,8 @@ public class BoardController {
 	@Autowired
 	private UploadService uploadService;
 
-	@RequestMapping("/list")
+//	@RequestMapping("/list")
+	@RequestMapping("/list_old")
 	public String list(Model model) {
 		log.info("@# list()");
 
