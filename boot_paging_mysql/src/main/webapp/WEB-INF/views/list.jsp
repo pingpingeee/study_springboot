@@ -25,7 +25,8 @@
 						<td>
 							<%-- ${dto.boardTitle} --%>
 								<!-- 			content_view : 컨트롤러단 호출 -->
-								<a href="content_view?boardNo=${dto.boardNo}">${dto.boardTitle}</a>
+								<!-- <a href="content_view?boardNo=${dto.boardNo}">${dto.boardTitle}</a> -->
+								<a class="move_link" href="${dto.boardNo}">${dto.boardTitle}</a>
 						</td>
 						<td>${dto.boardDate}</td>
 						<td>${dto.boardHit}</td>
@@ -69,6 +70,10 @@
 					</c:if>
 				</ul>
 			</div>
+			<form id="actionForm" action="list" method="get">
+				<input type="hidden" name="pageNum" value="${pageMaker.criteriaDTO.pageNum}">
+				<input type="hidden" name="amount" value="${pageMaker.criteriaDTO.amount}">
+			</form>
 		</body>
 		<style>
 			.div_page ul {
@@ -80,10 +85,40 @@
 		</html>
 		<script src="${pageContext.request.contextPath}/js/jquery.js"></script>
 		<script>
+			var actionForm = $("#actionForm");
+
 			// 페이지번호 처리
-			$(".paginate_button a").on("click", function(e){
+			$(".paginate_button a").on("click", function (e) {
 				e.preventDefault();
 				console.log("click했음");
 				console.log("@# href => " + $(this).attr("href"));
+
+				// actionForm.find("input[name='pageNum']").val(this).attr("href");
+				actionForm.find("input[name='pageNum']").val($(this).attr("href"));
+				// actionForm.submit();
+
+				// 버그처리(게시글 클릭 후 뒤로가기 누른 후 다른 페 이지 클릭 할 때 content_view2가 작동되는 것을 해결)
+				actionForm.attr("action", "list").submit();
 			}); // end of paginate_button click
+
+			// 게시글 처리
+			$(".move_link").on("click", function (e) {
+				e.preventDefault();
+				console.log("move_link click");
+				console.log("@# click => " + $(this).attr("href"));
+
+				var targetBno = $(this).attr("href");
+
+				// 버그처리(게시글 클릭 후 뒤로가기 누른 후 다른 게시글 클릭 할 때 &boardNo=번호 게속 누적되는 거 방지)
+				var bno = actionForm.find("input[name='boardNo']").val();
+				if(bno!=""){
+					actionForm.find("input[name='boardNo']").remove();
+				}
+
+				// "content_view?boardNo=${dto.boardNo}"를 actionForm로 처리
+				actionForm.append("<input type='hidden' name='boardNo' value='" + targetBno + "'>");
+				// actionForm.submit();
+				// 컨트롤러에 content_view로 찾아감
+				actionForm.attr("action", "content_view").submit();
+			});
 		</script>

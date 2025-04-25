@@ -10,8 +10,8 @@
                 from (select rownum, boardNo, boardName, boardTitle, boardContent, boardDate, boardHit
                     from ( select row_number() over(order by boardNO desc) as rownum,
                         boardNo, boardName, boardTitle, boardContent, boardDate, boardHit
-                        from tbl_board
-                        order by boardNo desc
+	                        from tbl_board
+	                        order by boardNo desc
                         ) a
                     where rownum <= (#{pageNum} * #{amount})
                 )aa
