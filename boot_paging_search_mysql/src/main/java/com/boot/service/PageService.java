@@ -7,5 +7,5 @@ import java.util.ArrayList;
 
 public interface PageService {
     public ArrayList<BoardDTO> listWithPaging(CriteriaDTO criteriaDTO);
-    public int getTotalCount();
+    public int getTotalCount(CriteriaDTO criteriaDTO);
 }

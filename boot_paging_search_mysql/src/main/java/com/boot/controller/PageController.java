@@ -25,7 +25,7 @@ public class PageController {
 		log.info("@# criteriaDTO => " + criteriaDTO);
 
 		ArrayList<BoardDTO> list = service.listWithPaging(criteriaDTO);
-		int total = service.getTotalCount();
+		int total = service.getTotalCount(criteriaDTO);
 
 		model.addAttribute("list", list);
 		model.addAttribute("pageMaker", new PageDTO(total, criteriaDTO));

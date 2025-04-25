@@ -31,9 +31,9 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public int getTotalCount() {
+    public int getTotalCount(CriteriaDTO criteriaDTO) {
         PageDAO dao = sqlSession.getMapper(PageDAO.class);
-        int total = dao.getTotalCount();
+        int total = dao.getTotalCount(criteriaDTO);
         return total;
     }
 }

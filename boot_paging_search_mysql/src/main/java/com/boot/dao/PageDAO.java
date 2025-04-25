@@ -9,5 +9,5 @@ import java.util.HashMap;
 public interface PageDAO {
 //    Criteria 객체를 이용해서 페이징처리
     public ArrayList<BoardDTO> listWithPaging(CriteriaDTO criteriaDTO);
-    public int getTotalCount();
+    public int getTotalCount(CriteriaDTO criteriaDTO);
 }
